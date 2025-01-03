@@ -1,0 +1,81 @@
+<!-- Survey Search Section -->
+
+<div class="container" id="survey-select-container">
+    <!-- Search Bar -->
+    <div class="input-group mb-3" id="survey-input-group">
+        <span class="input-group-text" id="survey-section"><i class="bi bi-search"></i></span>
+        <input id="survey-search-input" type="text" class="form-control" placeholder="Search surveys" aria-label="Search Surveys" oninput="SurveySelect.surveySearch()">
+        <button id="survey-filter-button" class="btn btn-outline-secondary bi bi-funnel" type="button" data-bs-toggle="collapse" data-bs-target="#survey-filter-options" aria-expanded="false" aria-controls="survey-filter-options"></button>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="accordion d-none mb-3" id="survey-filters-container">
+        <div class="accordion-item">
+            <div id="survey-filter-options" class="accordion-collapse collapse" aria-labelledby="surveyFilterHeading" data-bs-parent="#survey-filters-accordion">
+                <div class="accordion-body">
+                    <label for="preset-filter" class="form-label">Preset</label>
+                    <select id="preset-filter" class="form-select">
+                        <option value="">All Surveys</option>
+                        <!-- Populate options dynamically from API or a predefined list -->
+                        <option value="picture">Picture</option>
+                        <option value="cinematography">Cinematography</option>
+                        <option value="vfx">VFX</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Results -->
+    <div id="survey-section-content" class="list-group">
+        <ul id="surveys-list" class="container"></ul>
+        <ul id="criteria-list" class="container"></ul>
+    </div>
+
+
+    <!-- Criterion Description Modal -->
+    <div class="modal" id="criterion-info-modal" tabindex="-1" aria-labelledby="criterion-info-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="criterion-info-modal-label">Criterion Description</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="criterion-info-modal-content">
+                    <!-- Description will be dynamically injected here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Criterion Card Template -->
+    <template id="criterion-card-template">
+        <div class="card criterion-card mb-2" data-criterion-name="Dynamic Name">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>
+                        <span class="text-truncate" style="max-width: 70%;">Dynamic Name</span>
+                        <button class="btn btn-link text-info" type="button">
+                            <i class="bi bi-info-circle"></i>
+                        </button>
+                    </span>
+                    <input id="criterion-value-display" type="text" class="form-control text-center criterion-value-display" style="width: 50px; border-color: #6c757d; border-radius: 10% 0% 0% 10%; flex-shrink: 0; margin-left: auto;" value=>
+                    <button id="criterion-value-clear" class="btn btn-outline-secondary" type="button" style="border-radius: 0% 10% 10% 0%; ">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+                <div class="range-labels mt-2">
+                    <span>Substandard</span>
+                    <span>Typical</span>
+                    <span>Exceptional</span>
+                </div>
+                <input id="criterion-range" type="range" min="1" max="10" class="form-range w-100 cleared criterion-range">
+            </div>
+        </div>
+    </template>
+
+
+</div>

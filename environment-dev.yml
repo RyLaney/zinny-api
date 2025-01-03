@@ -1,0 +1,19 @@
+name: zinny-dev
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - black
+  - flask
+  - jinja2
+  - numpy
+  - setuptools
+  - wheel
+  - pandas
+  - pytest
+  - pylint
+  # pip dependencies
+  - pip
+  - pip:
+      - git+https://github.com/RyLaney/zinny-surveys.git

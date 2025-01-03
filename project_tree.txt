@@ -1,0 +1,89 @@
+zinny-server
+├── CONTRIBUTING.md
+├── LICENSE
+├── README.md
+├── environment.yml
+├── pytest.ini
+├── requirements-dev.txt
+├── requirements.txt
+├── setup.py
+├── src
+│   ├── docs.py
+│   ├── invalid_survey.json
+│   ├── main.py
+│   ├── zinny_api
+│   │   ├── __init__.py
+│   │   ├── api
+│   │   │   ├── __init__.py
+│   │   │   ├── collections.py
+│   │   │   ├── ratings.py
+│   │   │   ├── screen_types.py
+│   │   │   ├── service.py
+│   │   │   ├── surveys.py
+│   │   │   ├── title_types.py
+│   │   │   ├── titles.py
+│   │   │   └── weights.py
+│   │   ├── config.py
+│   │   ├── data
+│   │   │   ├── surveys
+│   │   │   ├── title_types
+│   │   │   ├── titles
+│   │   │   └── weights
+│   │   ├── db
+│   │   │   ├── __init__.py
+│   │   │   ├── db_init.py
+│   │   │   ├── db_schema.py
+│   │   │   └── db_test.py
+│   │   ├── routes
+│   │   │   ├── __init__.py
+│   │   │   └── errors.py
+│   │   ├── templates
+│   │   │   ├── 404.html
+│   │   │   ├── 500.html
+│   │   │   ├── about.html
+│   │   │   ├── layouts
+│   │   │   │   ├── base-component.html
+│   │   │   │   └── base.html
+│   │   │   ├── partials
+│   │   │   │   ├── footer.html
+│   │   │   │   ├── header_bar.html
+│   │   │   │   ├── screen_select.html
+│   │   │   │   ├── survey_select.html
+│   │   │   │   └── title_select.html
+│   │   │   ├── ratings
+│   │   │   │   └── ratings_page.html
+│   │   │   ├── surveys
+│   │   │   │   ├── survey_component.html
+│   │   │   │   └── survey_page.html
+│   │   │   └── titles
+│   │   │       └── title_component.html
+│   │   └── utils
+│   │       ├── __init__.py
+│   │       ├── db_helpers.py
+│   │       └── import_helpers.py
+│   └── zinny_api.egg-info
+│       ├── PKG-INFO
+│       ├── SOURCES.txt
+│       ├── dependency_links.txt
+│       ├── entry_points.txt
+│       ├── requires.txt
+│       └── top_level.txt
+└── tests
+    ├── __init__.py
+    ├── data_samples.py
+    ├── test_api_collections.py
+    ├── test_api_ratings.py
+    ├── test_api_screen_types.py
+    ├── test_api_service.py
+    ├── test_api_surveys.py
+    ├── test_api_title_search.py
+    ├── test_api_title_types.py
+    ├── test_api_titles.py
+    ├── test_api_weights.py
+    ├── test_db.py
+    ├── test_db_schema.py
+    ├── test_init.py
+    ├── test_util_import_helpers.py
+    └── util_db_helpers.py
+
+24 directories, 75 files

@@ -1,0 +1,11 @@
+[
+    {"type": "tvSeries", "display_name": "TV Series"},
+    {"type": "tvMovie", "display_name": "TV Movie"},
+    {"type": "tvMiniSeries", "display_name": "TV Mini-Series"},
+    {"type": "movie", "display_name": "Movie"},
+    {"type": "short", "display_name": "Short"},
+    {"type": "video", "display_name": "Video"},
+    {"type": "tvShort", "display_name": "TV Short"},
+    {"type": "tvEpisode", "display_name": "TV Episode"},
+    {"type": "tvSpecial", "display_name": "TV Special"}
+]
