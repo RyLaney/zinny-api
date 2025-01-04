@@ -3,6 +3,7 @@
 import sqlite3
 import os
 from pathlib import Path
+import platform
 from flask import current_app
 
 from zinny_api.utils.import_helpers import (
@@ -23,21 +24,85 @@ from .db_schema import (
     SCHEMA_WEIGHTS_TABLE
 )
 
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long,missing-function-docstring
 
+
+def get_app_name():
+    try:
+        return current_app.config.get("APP_NAME", "zinny")
+    except RuntimeError:  # If current_app is unavailable
+        return "zinny"
+
+
+def get_data_paths(create_udp=True, create_pdp=False):
+    """Returns the local user data path (udp) and global program data path (pdp) ."""
+    system = platform.system()
+    if system == "Windows":
+        pdp = os.environ["PROGRAMDATA"]
+        udp = os.path.join(os.environ["LOCALAPPDATA"])
+    elif system == "Darwin":  # macOS
+        pdp = "/Library/Application Support"
+        udp = os.path.join(Path.home(), "Library", "Application Support")
+    else:  # Linux and other Unix-like systems
+        pdp = "/usr/share"
+        udp = os.path.join(Path.home(), ".local", "share")
+
+    app_name = get_app_name()
+
+    # Append the app name to the paths
+    pdp = os.path.join(pdp, app_name)
+    udp = os.path.join(udp, app_name)
+
+    # Create the directories if they don't exist
+    _ = os.makedirs(pdp, exist_ok=True) if create_pdp else None
+    _ = os.makedirs(udp, exist_ok=True) if create_udp else None
+
+    current_app.config["DATA_PROG_PATH"] = pdp
+    current_app.config["DATA_USER_PATH"] = udp
+
+    return {"udp": udp, "pdp": pdp}
+
+def get_user_data_path():
+    udp = get_data_paths(create_udp=True, create_pdp=False)["udp"]
+    return udp
+
+def get_program_data_path():
+    pdp = get_data_paths(create_udp=False, create_pdp=True)["pdp"]
+    return pdp
 
 def get_database_path():
     """Determine the zinny_apiropriate database path based on the platform."""
-    if os.name == 'nt':  # Windows
-        base_dir = os.getenv('LOCALAPPDATA', os.path.expanduser('~\\AppData\\Local'))
-    else:  # UNIX-like (Linux, macOS)
-        base_dir = os.getenv('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
 
-    zinny_api_dir = os.path.join(base_dir, 'zinny')
-    Path(zinny_api_dir).mkdir(parents=True, exist_ok=True)  # Ensure directory exists
-    return os.path.join(zinny_api_dir, 'database.db')
+    user_data_path = get_user_data_path()
+    zinny_api_dir = os.path.join(user_data_path, 'Zinny')
+    os.makedirs(zinny_api_dir, exist_ok=True)
+
+    return os.path.join(zinny_api_dir, 'zinny-1.0.sqlite')
 
 DATABASE_PATH = get_database_path()
+current_app.config["DATABASE_PATH"] = DATABASE_PATH
+
+def get_survey_data_path():
+    """Returns the program data path for surveys."""
+    program_data_path = get_program_data_path()
+    survey_path = os.path.join(program_data_path, 'data', 'surveys')
+    if not os.path.exists(survey_path):
+        return None
+    # else
+    return survey_path
+
+# TODO: use proj_data_path for surveys in import_helpers.py
+# def load_survey(file_name):
+#     import json
+#     data_path = get_program_data_path()
+#     file_path = os.path.join(data_path, file_name)
+
+#     with open(file_path, "r", encoding='utf-8') as f:
+#         return json.load(f)
+
+# # Example usage
+# survey_data = load_survey("vfx.json")
+# print(survey_data)
 
 
 def get_connection():

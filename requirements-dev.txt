@@ -6,4 +6,5 @@ pylint
 pandas
 setuptools
 wheel
-git+https://github.com/username/zinny-surveys.git
+zinny-surveys
+
