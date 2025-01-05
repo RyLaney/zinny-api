@@ -5,6 +5,8 @@ import os
 from pathlib import Path
 import platform
 from flask import current_app
+import importlib
+
 
 from zinny_api.utils.import_helpers import (
     load_titles_from_dir,
@@ -34,7 +36,7 @@ def get_app_name():
         return "zinny"
 
 
-def get_data_paths(create_udp=True, create_pdp=False):
+def get_system_data_paths(create_udp=True, create_pdp=False):
     """Returns the local user data path (udp) and global program data path (pdp) ."""
     system = platform.system()
     if system == "Windows":
@@ -57,44 +59,47 @@ def get_data_paths(create_udp=True, create_pdp=False):
     _ = os.makedirs(pdp, exist_ok=True) if create_pdp else None
     _ = os.makedirs(udp, exist_ok=True) if create_udp else None
 
-    current_app.config["DATA_PROG_PATH"] = pdp
-    current_app.config["DATA_USER_PATH"] = udp
-
     return {"udp": udp, "pdp": pdp}
 
-def get_user_data_path():
-    udp = get_data_paths(create_udp=True, create_pdp=False)["udp"]
+def get_userdata_path():
+    udp = get_system_data_paths(create_udp=True, create_pdp=False)["udp"]
     return udp
 
-def get_program_data_path():
-    pdp = get_data_paths(create_udp=False, create_pdp=True)["pdp"]
+def get_progdata_path():
+    pdp = get_system_data_paths(create_udp=False, create_pdp=True)["pdp"]
     return pdp
 
 def get_database_path():
     """Determine the zinny_apiropriate database path based on the platform."""
 
-    user_data_path = get_user_data_path()
-    zinny_api_dir = os.path.join(user_data_path, 'Zinny')
+    userdata_path = get_userdata_path()
+    zinny_api_dir = os.path.join(userdata_path, 'Zinny')
     os.makedirs(zinny_api_dir, exist_ok=True)
 
     return os.path.join(zinny_api_dir, 'zinny-1.0.sqlite')
 
-DATABASE_PATH = get_database_path()
-current_app.config["DATABASE_PATH"] = DATABASE_PATH
-
-def get_survey_data_path():
-    """Returns the program data path for surveys."""
-    program_data_path = get_program_data_path()
-    survey_path = os.path.join(program_data_path, 'data', 'surveys')
-    if not os.path.exists(survey_path):
+def get_resource_paths(package, data_type, scopes=['shared', 'local']):
+    # package = 'zinny_surveys'
+    package_root = importlib.resources.files(package)
+    if not os.path.exists(package_root):
         return None
-    # else
-    return survey_path
+    paths = {}
+    for scope in scopes:
+        paths[scope] = package_root.joinpath('data', data_type, scope)
+    return paths
+
+# /opt/conda/miniconda3/envs/zinny-dev/lib/python3.11/site-packages/zinny_surveys/data/surveys/shared
+# /opt/conda/miniconda3/envs/zinny-dev/lib/python3.11/site-packages/zinny_surveys/data/surveys/shared'
+
+DATABASE_PATH = get_database_path()
+SURVEYS_PATHS = get_resource_paths('zinny_surveys', 'surveys')
+WEIGHTS_PATHS = get_resource_paths('zinny_surveys', 'weights')
+
 
 # TODO: use proj_data_path for surveys in import_helpers.py
 # def load_survey(file_name):
 #     import json
-#     data_path = get_program_data_path()
+#     data_path = get_progdata_path()
 #     file_path = os.path.join(data_path, file_name)
 
 #     with open(file_path, "r", encoding='utf-8') as f:
@@ -133,8 +138,8 @@ def init_db(load_data=False, data_path=None):
             print("Loading initial data...")
             for data_scope in ("shared", "local"):
                 load_titles_from_dir(conn, directory=os.path.join(data_path, "titles", data_scope))
-                load_surveys_from_dir(conn, directory=os.path.join(data_path, "surveys", data_scope))
-                load_weight_presets_from_dir(conn, directory=os.path.join(data_path, "weights", data_scope))
+                load_surveys_from_dir(conn, directory=SURVEYS_PATHS[data_scope])
+                load_weight_presets_from_dir(conn, directory=WEIGHTS_PATHS[data_scope])
                 load_title_types_from_dir(conn, directory=os.path.join(data_path, "title_types", data_scope))
 
     conn.close()

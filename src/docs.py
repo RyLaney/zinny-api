@@ -23,7 +23,7 @@ def extract_routes_from_code(file_path):
 
 # Example Usage
 from glob import glob
-api_files = glob('src/zinny_api/v1/api/v1/*.py')
+api_files = glob('src/zinny_api/api/v1/*.py')
 print(api_files)
 
 for api_file in api_files:
