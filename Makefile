@@ -1,11 +1,15 @@
 VERSION=$(shell sed -n 's/^version = "\([0-9.]*\)"/\1/p' pyproject.toml)
 
 build:
+	$(MAKE) clean
 	python ../zinny-dev/bump_version.py
 	python -m build
 
 install:
 	python -m pip install --upgrade .
+
+run:
+	zinny-api
 
 test:
 	python -m pytest tests
