@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "zinny-api"
-version = "1.0.7"
-description = "A Web UI for rating Motion Picture titles.  Front end for Zinny API"
+version = "1.0.11"
+description = "An API backed for Zinny, the movie rating app."
 authors = [
     { name = "Ryan Laney" }
 ]
@@ -20,8 +20,10 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.setuptools]
-packages = ["zinny_api"]
 package-dir = {"" = "src"}
 include-package-data = true
 
@@ -30,7 +32,11 @@ zinny-api = "zinny_api.cli:main"
 
 [tool.setuptools.package-data]
 "zinny_surveys" = [
-    "data/surveys/shared/acting.json",
+    "data/surveys/shared/*.json",
+    "data/weights/shared/*.json",
+    "data/titles/shared/*.json",
+    "data/titles/shared/*.tsv",
+    "data/title_types/shared/*.json",
     "data/surveys/shared/cinematography.json",
     "data/surveys/shared/directoral.json",
     "data/surveys/shared/docs.json",
@@ -48,6 +54,9 @@ zinny-api = "zinny_api.cli:main"
     "data/weights/shared/picture_weights.json",
     "data/weights/shared/vfx_extended_weights.json",
     "data/weights/shared/vfx_weights.json",
+    "data/titles/shared/titles_default.json",
+    "data/titles/shared/titles_sample_file.tsv",
+    "data/title_types/shared/title_types.json",
 ]
 
 [project.optional-dependencies]
