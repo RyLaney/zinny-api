@@ -6,7 +6,11 @@ build:
 	python -m build
 
 install:
+	$(MAKE) uninstall
 	python -m pip install --upgrade .
+
+uninstall:
+	python -m pip uninstall -y zinny-api
 
 run:
 	zinny-api
@@ -22,6 +26,7 @@ testpypi:
 	python -m twine upload --repository testpypi dist/*
 
 testpypi-install:
+	$(MAKE) uninstall
 	python -m pip install --index-url https://test.pypi.org/simple/ --no-deps zinny-api
 
 
@@ -30,6 +35,7 @@ pypi:
 	$(MAKE) tag
 
 pypi-install:
+	$(MAKE) uninstall
 	python -m pip install zinny-api
 
 
