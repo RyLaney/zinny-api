@@ -4,8 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "zinny-api"
-version = "1.0.11"
+version = "1.0.15"
 description = "An API backed for Zinny, the movie rating app."
+dependencies = [
+    "flask",
+    "zinny-surveys"
+]
 authors = [
     { name = "Ryan Laney" }
 ]
@@ -31,31 +35,9 @@ include-package-data = true
 zinny-api = "zinny_api.cli:main"
 
 [tool.setuptools.package-data]
-"zinny_surveys" = [
-    "data/surveys/shared/*.json",
-    "data/weights/shared/*.json",
+"zinny_api" = [
     "data/titles/shared/*.json",
     "data/titles/shared/*.tsv",
-    "data/title_types/shared/*.json",
-    "data/surveys/shared/cinematography.json",
-    "data/surveys/shared/directoral.json",
-    "data/surveys/shared/docs.json",
-    "data/surveys/shared/picture.json",
-    "data/surveys/shared/picture_extended.json",
-    "data/surveys/shared/vfx.json",
-    "data/surveys/shared/vfx_exhaustive.json",
-    "data/surveys/shared/vfx_extended.json",
-    "data/weights/shared/acting_weights.json",
-    "data/weights/shared/cinematography_weights.json",
-    "data/weights/shared/directoral_weights.json",
-    "data/weights/shared/docs_weights.json",
-    "data/weights/shared/picture_storyteller.json",
-    "data/weights/shared/picture_technologist.json",
-    "data/weights/shared/picture_weights.json",
-    "data/weights/shared/vfx_extended_weights.json",
-    "data/weights/shared/vfx_weights.json",
-    "data/titles/shared/titles_default.json",
-    "data/titles/shared/titles_sample_file.tsv",
     "data/title_types/shared/title_types.json",
 ]
 
@@ -64,7 +46,6 @@ dev = [
     "pytest",
     "black",
 ]
-
 
 [project.urls]
 Homepage = "https://github.com/RyLaney/zinny-webui"

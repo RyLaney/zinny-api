@@ -2,10 +2,10 @@
 
 import sqlite3
 import os
+import importlib
 from pathlib import Path
 import platform
 from flask import current_app
-import importlib
 
 
 from zinny_api.utils.import_helpers import (
@@ -73,13 +73,15 @@ def get_database_path():
     """Determine the zinny_apiropriate database path based on the platform."""
 
     userdata_path = get_userdata_path()
-    zinny_api_dir = os.path.join(userdata_path, 'Zinny')
+    zinny_api_dir = os.path.join(userdata_path, 'db')
     os.makedirs(zinny_api_dir, exist_ok=True)
 
     return os.path.join(zinny_api_dir, 'zinny-1.0.sqlite')
 
-def get_resource_paths(package, data_type, scopes=['shared', 'local']):
-    # package = 'zinny_surveys'
+def get_resource_paths(package, data_type, scopes=None):
+    if scopes is None:
+        scopes = ['shared', 'local']
+
     package_root = importlib.resources.files(package)
     if not os.path.exists(package_root):
         return None
@@ -94,7 +96,7 @@ def get_resource_paths(package, data_type, scopes=['shared', 'local']):
 DATABASE_PATH = get_database_path()
 SURVEYS_PATHS = get_resource_paths('zinny_surveys', 'surveys')
 WEIGHTS_PATHS = get_resource_paths('zinny_surveys', 'weights')
-
+TITLES_PATHS = get_resource_paths('zinny_api', 'titles')
 
 # TODO: use proj_data_path for surveys in import_helpers.py
 # def load_survey(file_name):
