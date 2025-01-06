@@ -4,7 +4,7 @@ from flask import Flask
 from .db.db_init import init_db
 
 from . import api
-from . import routes
+# from zinny_api import routes
 # from .routes.errors import errors_bp
 
 # pylint: disable=import-outside-toplevel,line-too-long
