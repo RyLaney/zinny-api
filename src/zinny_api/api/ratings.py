@@ -97,9 +97,6 @@ def save_rating():
     """Save a rating for a title."""
     data = request.get_json()
 
-    print("save_rating")
-    print(data)
-
     title_id = data.get("title_id")
     survey_id = data.get("survey_id")
     ratings = json.dumps(data.get("ratings"))
