@@ -28,20 +28,27 @@ def add_titles_test_data(conn, titles):
 
 def add_survey_test_data(conn, survey_data):
     """Insert a single survey into the test database."""
+    # id, name and criteria are required fields
+    # make sure to set defaults and extends to None if they are not provided
+
+
+
     conn.execute(
         """
-        INSERT INTO surveys (id, name, version, description, defaults, criteria)
-        VALUES (?, ?, ?, ?, ?, ?);
+        INSERT INTO surveys (id, name, version, description, extends, defaults, criteria)
+        VALUES (?, ?, ?, ?, ?, ?, ?);
         """,
         (
-            survey_data["id"],
-            survey_data["name"],
-            survey_data["version"],
-            survey_data["description"],
-            json.dumps(survey_data["defaults"]),
-            json.dumps(survey_data["criteria"]),
+            survey_data.get("id"),
+            survey_data.get("name"),
+            survey_data.get("version"),
+            survey_data.get("description"),
+            survey_data.get("extends"),
+            json.dumps(survey_data.get("defaults", {})),
+            json.dumps(survey_data.get("criteria", [])),
         )
     )
+
 
 def add_surveys_test_data(conn, surveys):
     """Insert multiple surveys into the test database."""
@@ -59,10 +66,10 @@ def add_weight_test_data(conn, weight_data):
         VALUES (?, ?, ?, ?);
         """,
         (
-            weight_data["name"],
-            weight_data["description"],
-            weight_data["survey_id"],
-            json.dumps(weight_data["criteria_weights"]),
+            weight_data.get("name"),
+            weight_data.get("description"),
+            weight_data.get("survey_id"),
+            json.dumps(weight_data.get("criteria_weights", {})),
         )
     )
 
@@ -82,10 +89,10 @@ def add_rating_test_data(conn, rating_data):
         VALUES (?, ?, ?, ?);
         """,
         (
-            rating_data["title_id"],
-            rating_data["survey_id"],
-            json.dumps(rating_data["ratings"]),
-            rating_data["comments"]
+            rating_data.get("title_id"),
+            rating_data.get("survey_id"),
+            json.dumps(rating_data.get("ratings",{})),
+            rating_data.get("comments")
         )
     )
 
@@ -109,14 +116,14 @@ def add_collection_test_data(conn, collection_data):
     for item in collection_data["items"]:
         cursor.execute(
             "INSERT INTO titles (name, year) VALUES (?, ?) ON CONFLICT(name, year) DO NOTHING;",
-            (item["name"], item["year"])
+            (item.get("name"), item.get("year"))
         )
         cursor.execute(
             """
             INSERT INTO collection_titles (collection_id, title_id)
             SELECT ?, id FROM titles WHERE name = ? AND year = ?;
             """,
-            (collection_id, item["name"], item["year"])
+            (collection_id, item.get("name"), item.get("year"))
         )
     conn.commit()
 
@@ -135,7 +142,7 @@ def add_title_types_test_data(conn, title_types):
             INSERT INTO title_types (type, display_name)
             VALUES (?, ?);
             """,
-            (title_type["type"], title_type["display_name"])
+            (title_type.get("type"), title_type.get("display_name"))
         )
 
 # screen_types
@@ -148,5 +155,5 @@ def add_screen_types_test_data(conn, screen_types):
             INSERT INTO screen_types (type, display_name)
             VALUES (?, ?);
             """,
-            (screen_type["type"], screen_type["display_name"])
+            (screen_type.get("type"), screen_type.get("display_name"))
         )
