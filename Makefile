@@ -7,7 +7,11 @@ build:
 
 install:
 	$(MAKE) uninstall
-	python -m pip install --upgrade .
+	python -m pip install .
+
+install-e:
+	$(MAKE) uninstall
+	python -m pip install -e .
 
 uninstall:
 	python -m pip uninstall -y zinny-api
