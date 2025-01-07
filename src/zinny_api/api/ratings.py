@@ -124,14 +124,10 @@ def save_rating():
         if not screen_type:
             return jsonify({"error": "Invalid 'screen_type_id'."}), 400
 
-    print(f"screen_type_id: {screen_type_id}, screen_type: {screen_type}")
-    print(f"title_id: {title_id}, survey_id: {survey_id}, ratings: {ratings}, comments: {comments}")
-
     if not title_id or not survey_id or not ratings:
         message = "Missing required fields."
         message += f" title_id: {title_id}, survey_id: {survey_id}, ratings: {ratings}"
         return jsonify({"error": message}), 400
-
 
     try:
         cursor = conn.cursor()
