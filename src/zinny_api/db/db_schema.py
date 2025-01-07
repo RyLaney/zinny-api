@@ -74,7 +74,9 @@ CREATE TABLE IF NOT EXISTS surveys (
     version TEXT,
     description TEXT,
     defaults TEXT,
-    criteria TEXT NOT NULL
+    criteria TEXT NOT NULL,
+    extends TEXT,  -- Reference to the parent survey
+    FOREIGN KEY (extends) REFERENCES surveys(id) ON DELETE SET NULL
 );
 """
 
