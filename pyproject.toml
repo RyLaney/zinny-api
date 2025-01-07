@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "zinny-api"
-version = "1.0.15"
+version = "1.0.19"
 description = "An API backed for Zinny, the movie rating app."
 dependencies = [
     "flask",
