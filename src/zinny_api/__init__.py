@@ -4,6 +4,8 @@ from flask import Flask
 from .db.db_init import init_db
 
 from . import api
+from . import config
+
 # from zinny_api import routes
 # from .routes.errors import errors_bp
 

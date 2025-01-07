@@ -6,3 +6,4 @@ from . import surveys
 from . import weights
 from . import ratings
 from . import service
+from . import collections
