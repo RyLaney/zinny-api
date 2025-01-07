@@ -1,9 +1,9 @@
 """Testing /ratings endpoints with database integration."""
 import os
 import json
-import pytest
 from unittest.mock import patch
 import sqlite3
+import pytest
 
 from flask import Flask
 
@@ -15,6 +15,13 @@ from zinny_api.db.db_schema import (
     SCHEMA_RATINGS_TABLE,
     SCHEMA_SURVEYS_TABLE
 )
+# from zinny_api.api.collections import collections_bp
+
+from tests.util_db_helpers import (
+    add_titles_test_data,
+    add_surveys_test_data,
+    add_ratings_test_data
+)
 from .data_samples import (
     TITLES_2024VFX_SAMPLE,
     SURVEY_VFX_SAMPLE,
@@ -23,15 +30,9 @@ from .data_samples import (
     RATINGS_PICTURE_SAMPLE
 )
 
-from tests.util_db_helpers import (
-    add_titles_test_data,
-    add_surveys_test_data,
-    add_ratings_test_data
-)
-
-
 # pylint: disable=redefined-outer-name,line-too-long
 # pylint: disable=missing-function-docstring,unused-argument
+
 
 @pytest.fixture(scope="function")
 def setup_database(monkeypatch):
@@ -102,7 +103,7 @@ def test_save_rating(client):
 def test_save_rating_missing_fields(client):
     """Test saving a rating with missing required fields."""
     rating_data = {
-        "survey_id": "vfx",
+        "survey_id": "vfx_basic",
         "ratings": '{"artistry": 8}'
     }
     response = client.post('/api/v1/ratings/', json=rating_data)
@@ -127,13 +128,13 @@ def test_get_rating_by_id(client):
     assert response.status_code == 200
     rating = response.get_json()
     assert rating["id"] == 1
-    assert rating["survey_id"] == "vfx"
+    assert rating["survey_id"] == "vfx_basic"
 
 
 def test_get_rating_by_title_and_survey(client):
     """Test fetching a rating by title_id and survey_id."""
     title_id = 1
-    survey_id = "vfx"
+    survey_id = "vfx_basic"
 
     response = client.get(f'/api/v1/ratings/?title_id={title_id}&survey_id={survey_id}')
     assert response.status_code == 200
@@ -175,7 +176,7 @@ def test_save_rating_with_screen_type(client):
     """Test saving a rating with a valid screen_type."""
     rating_data = {
         "title_id": 1,
-        "survey_id": "vfx",
+        "survey_id": "vfx_basic",
         "ratings": '{"artistry": 9}',
         "comments": "Excellent effects!",
         "screen_type": "big"
@@ -195,7 +196,7 @@ def test_save_rating_invalid_screen_type(client):
     """Test saving a rating with an invalid screen type."""
     rating_data = {
         "title_id": 1,
-        "survey_id": "vfx",
+        "survey_id": "vfx_basic",
         "ratings": '{"artistry": 8}',
         "screen_type": "invalid_type"
     }
@@ -211,7 +212,7 @@ def test_update_rating(client, setup_database):
     title_id = 4
     rating_data = {
         "title_id": title_id,
-        "survey_id": "vfx",
+        "survey_id": "vfx_basic",
         "ratings": {"artistry": 8, "technical_achievement": 9},
         "comments": ""
     }
@@ -224,7 +225,7 @@ def test_update_rating(client, setup_database):
     # Attempt to insert a duplicate with changes
     rating_data = {
         "title_id": title_id,
-        "survey_id": "vfx",
+        "survey_id": "vfx_basic",
         "ratings": {"artistry": 10, "technical_achievement": 10},
         "comments": "Great effects!"
     }
@@ -301,9 +302,6 @@ def test_export_ratings(client, setup_database):
 @pytest.fixture
 def empty_client():
     """Create a Flask test client with an empty database."""
-    from flask import Flask
-    from zinny_api.api.collections import collections_bp
-
     test_db_path_empty = "/tmp/empty_test_database.db"
 
     # Patch the DATABASE_PATH dynamically for this test

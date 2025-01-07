@@ -173,7 +173,7 @@ def test_weights_preset_update(client):
     # Update the existing preset
     updated_preset = initial_preset.copy()
     updated_preset["description"] = "Updated weights for VFX evaluation."
-    updated_preset["survey_id"] = "vfx"
+    updated_preset["survey_id"] = "vfx_basic"
     updated_preset["criteria_weights"] = {
         "artistry": 0.5,
         "contribution": 0.5,

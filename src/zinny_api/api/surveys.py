@@ -7,7 +7,6 @@ from zinny_api.db.db_init import get_connection
 from zinny_api.utils.import_helpers import load_surveys_from_dir, process_survey_file
 from zinny_api.db.db_init import get_records
 
-
 surveys_bp = Blueprint('api/v1/surveys', __name__)
 
 
@@ -21,7 +20,8 @@ def expand_survey(survey_id):
     cursor.execute("SELECT * FROM surveys WHERE id = ?;", (survey_id,))
     survey = cursor.fetchone()
     if not survey:
-        return None  # Survey not found
+        conn.close()
+        return None  # Return None for not-found case, allowing caller to handle it
 
     survey = dict(survey)
     survey["criteria"] = json.loads(survey["criteria"])
@@ -30,13 +30,18 @@ def expand_survey(survey_id):
     parent_id = survey.get("extends")
     if parent_id:
         parent_survey = expand_survey(parent_id)
-        if parent_survey:
-            # Merge parent defaults and criteria into the current survey
-            survey["defaults"] = {**parent_survey["defaults"], **survey["defaults"]}
-            parent_criteria_ids = {c["id"] for c in parent_survey["criteria"]}
-            survey["criteria"] = [
-                c for c in survey["criteria"] if c["id"] not in parent_criteria_ids
-            ] + parent_survey["criteria"]
+        if not parent_survey:  
+            # here the None return in the parent survey and so we throw to send a 500
+            conn.close()
+            raise ValueError(f"Parent survey with ID '{parent_id}' not found.")
+
+        # else: found parent survey
+        # Merge parent defaults and criteria into the current survey
+        survey["defaults"] = {**parent_survey["defaults"], **survey["defaults"]}
+        parent_criteria_ids = {c["id"] for c in parent_survey["criteria"]}
+        survey["criteria"] = [
+            c for c in survey["criteria"] if c["id"] not in parent_criteria_ids
+        ] + parent_survey["criteria"]
 
     conn.close()
     return survey
@@ -67,18 +72,32 @@ def get_surveys():
 @surveys_bp.route('/<survey_id>', methods=['GET'])
 def get_survey(survey_id):
     """Retrieve a specific survey."""
-    expanded = request.args.get("expanded", "false").lower() == "true"
+    expanded = request.args.get("expanded", "true").lower() == "true"
 
     if expanded:
-        survey = expand_survey(survey_id)
-        if not survey:
-            return jsonify({"error": "Survey not found"}), 404
-        return jsonify(survey)
-    
+        try:
+            survey = expand_survey(survey_id)
+            if not survey:
+                return jsonify({"error": "Survey not found"}), 404
+            return jsonify(survey)
+        except ValueError as e:
+            # Handle missing parent surveys
+            return jsonify({"error": str(e)}), 500
+
+    # else:  # not expanded
     surveys = get_records("surveys", conditions="id = ?", condition_values=(survey_id,))
     if not surveys:
         return jsonify({"error": "Survey not found"}), 404
-    return jsonify(surveys[0])
+
+    survey = surveys[0]
+
+    # Parse the JSON fields
+    if survey.get("criteria"):
+        survey["criteria"] = json.loads(survey["criteria"])
+    if survey.get("defaults"):
+        survey["defaults"] = json.loads(survey["defaults"])
+
+    return jsonify(survey)
 
 
 @surveys_bp.route('/import', methods=['POST'])
@@ -148,9 +167,6 @@ def search_surveys():
     else:
         base_query += " ORDER BY survey.name DESC LIMIT ? OFFSET ?"
         params.extend([limit, (page - 1) * limit])
-    
-    print(base_query)
-    print(params)
 
     # Execute the query
     cursor.execute(base_query, params)

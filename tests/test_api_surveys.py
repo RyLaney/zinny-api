@@ -11,7 +11,7 @@ from zinny_api.db.db_schema import SCHEMA_SURVEYS_TABLE
 from zinny_api.db.db_init import get_connection
 
 from tests.util_db_helpers import add_survey_test_data
-from .data_samples import SURVEY_VFX_SAMPLE, SURVEY_PICTURE_SAMPLE
+from .data_samples import SURVEY_VFX_SAMPLE, SURVEY_VFX_EXTENDED_SAMPLE, SURVEY_PICTURE_SAMPLE
 
 
 # pylint: disable=redefined-outer-name,line-too-long
@@ -33,6 +33,7 @@ def setup_database(monkeypatch):
         conn.executescript(schema)
         print("Inserting sample data...")
         add_survey_test_data(conn, SURVEY_VFX_SAMPLE)
+        add_survey_test_data(conn, SURVEY_VFX_EXTENDED_SAMPLE)
         add_survey_test_data(conn, SURVEY_PICTURE_SAMPLE)
     conn.close()
 
@@ -72,7 +73,7 @@ def test_get_surveys(client, setup_database):
     response = client.get('/api/v1/surveys/')
     assert response.status_code == 200
     data = response.get_json()
-    assert any(survey["id"] == "vfx" for survey in data)
+    assert any(survey["id"] == "vfx_basic" for survey in data)
     assert any(survey["id"] == "picture" for survey in data)
 
 
@@ -86,23 +87,23 @@ def test_get_survey_invalid(client):
 
 def test_get_survey_by_id(client):
     """Test the /surveys/<id> endpoint with a valid ID."""
-    response = client.get('/api/v1/surveys/vfx')
+    response = client.get('/api/v1/surveys/vfx_basic')
     assert response.status_code == 200
     data = response.get_json()
-    assert data['id'] == "vfx"
+    assert data['id'] == "vfx_basic"
 
 
 def test_search_surveys(client, setup_database):
     """Test searching surveys by name."""
-    response = client.get('/api/v1/surveys/search?query=Visual')
+    response = client.get('/api/v1/surveys/search?query=Picture')
     assert response.status_code == 200
     data = response.get_json()
     results = data["results"]
     assert len(results) == 1
-    assert results[0]["id"] == "vfx"
+    assert results[0]["id"] == "picture"
 
     # Test case-insensitive search
-    response = client.get('/api/v1/surveys/search?query=visual')
+    response = client.get('/api/v1/surveys/search?query=picture')
     assert response.status_code == 200
     data = response.get_json()
     assert len(data["results"]) == 1
@@ -206,3 +207,109 @@ def test_import_survey_db_error(client):
     data = response.get_json()
     assert "error" in data
     assert "Database error" in data["error"]
+
+
+def test_get_survey_expanded(client, setup_database):
+    """Test fetching an expanded survey by ID."""
+    response = client.get('/api/v1/surveys/vfx_basic?expanded=true')
+    assert response.status_code == 200
+    data = response.get_json()
+
+    # Assert base fields
+    assert data["id"] == "vfx_basic"
+    assert data["name"] == "Visual Effects Assessment"
+    assert "criteria" in data
+    assert isinstance(data["criteria"], list)
+    assert len(data["criteria"]) > 0
+
+    # Assert criteria expansion
+    assert any(criterion["id"] == "artistry" for criterion in data["criteria"])
+    assert any(criterion["id"] == "technical_achievement" for criterion in data["criteria"])
+
+
+
+def test_get_survey_default_expanded(client, setup_database):
+    """Test fetching a survey defaults to expanded when no parameter is provided."""
+    response = client.get('/api/v1/surveys/vfx_basic')
+    assert response.status_code == 200
+    data = response.get_json()
+
+    # Assert criteria expansion
+    assert "criteria" in data
+    assert isinstance(data["criteria"], list)
+    assert len(data["criteria"]) > 0
+
+
+def test_get_survey_extended(client, setup_database):
+    """Test fetching an extended survey that inherits another."""
+    # Fetch the extended survey
+    response = client.get('/api/v1/surveys/vfx_extended?expanded=true')
+    assert response.status_code == 200
+    extended_data = response.get_json()
+
+    # Assert extended survey metadata
+    assert extended_data["id"] == "vfx_extended"
+    assert extended_data["name"] == "Visual Effects - Extended"
+    assert "extends" in extended_data
+    assert extended_data["extends"] == "vfx_basic"
+
+    # Assert extended criteria includes base criteria + extended criteria
+    extended_criteria = {criterion["id"] for criterion in extended_data["criteria"]}
+    expected_criteria = {"artistry", "technical_achievement", "fidelity", "necessity", "contribution"}
+    assert extended_criteria == expected_criteria
+
+
+def test_get_survey_base_only(client, setup_database):
+    """Test fetching a base survey without expansion."""
+    # Add base survey to the database
+
+    # Fetch the base survey
+    response = client.get('/api/v1/surveys/vfx_basic?expanded=false')
+    assert response.status_code == 200
+    base_data = response.get_json()
+
+    # Assert base survey metadata
+    assert base_data["id"] == "vfx_basic"
+    assert base_data["name"] == "Visual Effects Assessment"
+
+    # Assert criteria only includes base criteria
+    base_criteria = {criterion["id"] for criterion in base_data["criteria"]}
+    expected_criteria = {"artistry", "technical_achievement", "fidelity"}
+    assert base_criteria == expected_criteria
+
+
+def test_get_survey_with_invalid_extends(client, setup_database):
+    """Test fetching a survey with an invalid 'extends' reference."""
+    # Add extended survey with an invalid 'extends' reference to the database
+    invalid_extended_survey = SURVEY_VFX_EXTENDED_SAMPLE.copy()
+    invalid_extended_survey["extends"] = "nonexistent_survey"
+    invalid_extended_survey["id"] = "broken_extends_survey"
+    # print(invalid_extended_survey)
+
+    conn = get_connection()
+    with conn:
+        add_survey_test_data(conn, invalid_extended_survey)
+    conn.close()
+
+    # Fetch the extended survey
+    response = client.get('/api/v1/surveys/broken_extends_survey?expanded=true')
+    print(response.get_json())
+    assert response.status_code == 500
+    error_data = response.get_json()
+
+    # Assert error message
+    assert "error" in error_data
+    assert "Parent survey with ID" in error_data["error"]
+
+
+def test_get_survey_no_extends(client, setup_database):
+    """Test fetching a survey with no 'extends' reference."""
+
+    # Fetch the survey
+    response = client.get('/api/v1/surveys/vfx_basic?expanded=true')
+    assert response.status_code == 200
+    survey_data = response.get_json()
+
+    # Assert no 'extends' field
+    assert survey_data["extends"] is None
+    assert survey_data["id"] == "vfx_basic"

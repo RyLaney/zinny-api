@@ -53,6 +53,7 @@ def process_survey_file(cursor, file_stream):
             )
         )
     except Exception as e:
+        print(e)
         return {"error": f"Error inserting survey into database: {e}"}, 500
 
     return {"message": "Survey processed successfully", "survey_id": survey["id"]}, 200
@@ -68,7 +69,6 @@ def load_surveys_from_dir(conn, directory="data/surveys"):
     for file_name in os.listdir(directory):
         if file_name.endswith(".json"):
             file_path = os.path.join(directory, file_name)
-            # print(f"Processing survey file: {file_path}")
             with open(file_path, "r", encoding="utf-8") as file_stream:
                 result = process_survey_file(cursor, file_stream)
                 results.append(result)

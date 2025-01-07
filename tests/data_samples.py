@@ -6,7 +6,7 @@ import json
 
 # Sample Survey Data
 SURVEY_VFX_SAMPLE = {
-  "id": "vfx",
+  "id": "vfx_basic",
   "name": "Visual Effects Assessment",
   "version": "1.0",
   "description": "Evaluation criteria for visual effects, including animation .",
@@ -45,12 +45,47 @@ SURVEY_VFX_SAMPLE = {
   ]
 }
 
+SURVEY_VFX_EXTENDED_SAMPLE = {
+  "id": "vfx_extended",
+  "name": "Visual Effects - Extended",
+  "version": "1.0",
+  "description": "Extended criteria for visual effects.",
+  "author": "the-zinny team",
+  "extends": "vfx_basic",
+  "defaults": {
+    "range": [1, 10]
+  },
+    "criteria": [
+    {
+      "id": "necessity",
+      "name": "Necessity of VFX",
+      "description": "The importance of visual effects in conveying the story, or overall success.",
+      "markers": {
+        "1": "Not necessary",
+        "10": "Crucial"
+      }
+    },
+    {
+      "id": "contribution",
+      "name": "Contribution to Narrative",
+      "description": "The overall contribution of VFX to the film's narrative.",
+      "markers": {
+        "1": "Distraction",
+        "5": "Supportive",
+        "10": "Fundamental"
+      }
+    }
+  ]
+}
+
+
 SURVEY_PICTURE_SAMPLE = {
     "id": "picture",
     "name": "Picture Overall Ratings",
     "version": "1.0",
     "description": "Evaluation criteria for overall excellence of a Picture Show.",
     "author": "the-zinny team",
+    "extends": None,
     "defaults": {
       "range": [1, 10]
     },
@@ -229,7 +264,7 @@ WEIGHTS_VFX_SPARSE = {
 RATINGS_VFX_SAMPLE = [
   {
     "title_id": 1,
-    "survey_id": "vfx",
+    "survey_id": "vfx_basic",
     "ratings": {
       "artistry": 8,
       "technical_achievement": 9,
@@ -240,7 +275,7 @@ RATINGS_VFX_SAMPLE = [
   },
   {
     "title_id": 2,
-    "survey_id": "vfx",
+    "survey_id": "vfx_basic",
     "ratings": {
       "artistry": 7,
       "technical_achievement": 8,
