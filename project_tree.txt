@@ -1,73 +1,58 @@
-zinny-server
+.
+├── API_REFERENCE.md
 ├── CONTRIBUTING.md
 ├── LICENSE
+├── Makefile
 ├── README.md
+├── SETUP.md
 ├── environment.yml
+├── notes
+│   └── import_pkg_resources.py
+├── project_tree.txt
+├── pyproject.toml
 ├── pytest.ini
-├── requirements-dev.txt
 ├── requirements.txt
-├── setup.py
 ├── src
 │   ├── docs.py
-│   ├── invalid_survey.json
 │   ├── main.py
-│   ├── zinny_api
-│   │   ├── __init__.py
-│   │   ├── api
-│   │   │   ├── __init__.py
-│   │   │   ├── collections.py
-│   │   │   ├── ratings.py
-│   │   │   ├── screen_types.py
-│   │   │   ├── service.py
-│   │   │   ├── surveys.py
-│   │   │   ├── title_types.py
-│   │   │   ├── titles.py
-│   │   │   └── weights.py
-│   │   ├── config.py
-│   │   ├── data
-│   │   │   ├── surveys
-│   │   │   ├── title_types
-│   │   │   ├── titles
-│   │   │   └── weights
-│   │   ├── db
-│   │   │   ├── __init__.py
-│   │   │   ├── db_init.py
-│   │   │   ├── db_schema.py
-│   │   │   └── db_test.py
-│   │   ├── routes
-│   │   │   ├── __init__.py
-│   │   │   └── errors.py
-│   │   ├── templates
-│   │   │   ├── 404.html
-│   │   │   ├── 500.html
-│   │   │   ├── about.html
-│   │   │   ├── layouts
-│   │   │   │   ├── base-component.html
-│   │   │   │   └── base.html
-│   │   │   ├── partials
-│   │   │   │   ├── footer.html
-│   │   │   │   ├── header_bar.html
-│   │   │   │   ├── screen_select.html
-│   │   │   │   ├── survey_select.html
-│   │   │   │   └── title_select.html
-│   │   │   ├── ratings
-│   │   │   │   └── ratings_page.html
-│   │   │   ├── surveys
-│   │   │   │   ├── survey_component.html
-│   │   │   │   └── survey_page.html
-│   │   │   └── titles
-│   │   │       └── title_component.html
-│   │   └── utils
-│   │       ├── __init__.py
-│   │       ├── db_helpers.py
-│   │       └── import_helpers.py
-│   └── zinny_api.egg-info
-│       ├── PKG-INFO
-│       ├── SOURCES.txt
-│       ├── dependency_links.txt
-│       ├── entry_points.txt
-│       ├── requires.txt
-│       └── top_level.txt
+│   └── zinny_api
+│       ├── __init__.py
+│       ├── api
+│       │   ├── __init__.py
+│       │   ├── collections.py
+│       │   ├── ratings.py
+│       │   ├── screen_types.py
+│       │   ├── service.py
+│       │   ├── surveys.py
+│       │   ├── title_types.py
+│       │   ├── titles.py
+│       │   └── weights.py
+│       ├── cli.py
+│       ├── config.py
+│       ├── data
+│       │   ├── title_types
+│       │   │   ├── local
+│       │   │   └── shared
+│       │   │       └── title_types.json
+│       │   └── titles
+│       │       ├── local
+│       │       └── shared
+│       │           ├── titles_2024_sample.tsv
+│       │           ├── titles_default.json
+│       │           └── titles_sample_file.tsv
+│       ├── db
+│       │   ├── __init__.py
+│       │   ├── db_init.py
+│       │   └── db_schema.py
+│       └── utils
+│           ├── __init__.py
+│           └── import_helpers
+│               ├── __init__.py
+│               ├── common.py
+│               ├── surveys.py
+│               ├── title_types.py
+│               ├── titles.py
+│               └── weights.py
 └── tests
     ├── __init__.py
     ├── data_samples.py
@@ -86,4 +71,4 @@ zinny-server
     ├── test_util_import_helpers.py
     └── util_db_helpers.py
 
-24 directories, 75 files
+16 directories, 56 files
